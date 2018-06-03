@@ -181,6 +181,7 @@
     $addvar=$created_time;
             
     //========================================================check the note
+    //if there is any recorded booking time in the note
     if($arr!=null)
     {
         //change the string in to array by separating ','
@@ -197,12 +198,9 @@
             {
 
                 $ck=true;  
-
             }
         }
-        
-        
-        
+        //if there isn't any same booking time
         if(!$ck)
         {
             //========================================================update note
@@ -218,13 +216,11 @@
             $json_data = json_encode($data);
             postCurl($url, $json_data);
         }
-    
-
     }
+    //if the note is empty
     else
     {
             //========================================================update note
-
             $arr.=$addvar.",";
             $url="https://colourmypot.vendhq.com/api/2.0/customers/".$arr_cust["customers"][0]["id"];
             $input_arr=array("data" => array("note" => $arr)   );
@@ -236,9 +232,11 @@
             $url="https://colourmypot.vendhq.com/api/register_sales";
             $json_data = json_encode($data);
             postCurl($url, $json_data);
-        
-        
     }
+            
+            
+            
+            
             
             
             
