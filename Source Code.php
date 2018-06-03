@@ -6,7 +6,7 @@
     ini_set('max_execution_time', 300); 
     
 
-    //========================================================GET OCCASION ORDERS
+    //========================================================GET OCCASION JSON data of the latest order
     
     $url="https://app.getoccasion.com/api/v1/orders";
     $website="OCCASION";
@@ -14,6 +14,7 @@
     $array = json_decode($result, true);
 
 
+        
         $payment=$array["data"][0]["attributes"]["payment_status"];
         $booking=$array["data"][0]["attributes"]["status"];
         
@@ -37,7 +38,7 @@
             
             
             
-          //========================================================CREATE WORDPRESS CUSTOMER
+        //========================================================CREATE WORDPRESS CUSTOMER
             
             
             
@@ -60,13 +61,13 @@
             
             
             
-          //========================================================CREATE VEND CUSTOMER
+        //========================================================CREATE VEND CUSTOMER
 
 
 
 
 
-
+              //creating JSON data to create data in Vend JSON server
               $data = array(
               "first_name" => $first_name,
               "last_name" => $last_name,
@@ -134,7 +135,7 @@
             
 
 
-        //========================================================find the specific customer
+        //========================================================retrieve the customer's details using email in vend
 
         $url="https://colourmypot.vendhq.com/api/customers?page_size=10000000000000000&email=".$email;
         $website="VEND";
@@ -150,7 +151,7 @@
             
         
             
-          //========================================================order details
+          //========================================================VEND ORDER FOR THE LATEST ORDER
             
 
           $var = array($name, $description, $created_time);
@@ -172,40 +173,36 @@
           );
 
 
-        
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+    //recorded booking time in cutomer's note        
     $arr=$arr_cust["customers"][0]["note"];
-
+    
+    //cutomer's booking time from the latest order
     $addvar=$created_time;
             
     //========================================================check the note
     if($arr!=null)
     {
+        //change the string in to array by separating ','
+        $strvar = explode(',', $arr);
 
-    $strvar = explode(',', $arr);
-
-    $ck=false;
-    $cnt=0;
-    $counter=count($strvar);
-    for($cnt;$cnt<$counter;$cnt++)
-    {
-        if($strvar[$cnt]==$addvar)
+        $ck=false;
+        $cnt=0;
+        $counter=count($strvar);
+        
+        for($cnt;$cnt<$counter;$cnt++)
         {
+            //if recorded booking time of customer's note is the same as the first occasion json data
+            if($strvar[$cnt]==$addvar)
+            {
 
-        $ck=true;  
+                $ck=true;  
 
+            }
         }
-    }
+        
+        
+        
         if(!$ck)
         {
             //========================================================update note
@@ -296,6 +293,7 @@
 
     //===========================================================================FUNCTIONS
 
+    //create data in JSON server
     function postCurl($url, $json_data)
     {
             $authorization = "Authorization: Bearer key";
@@ -315,7 +313,7 @@
     }
 
 
-
+    //update data in JSON server
     function putCurl($url, $json_data)
     {
             $authorization = "Authorization: Bearer key";
@@ -337,7 +335,7 @@
 
 
 
-  
+    //retrieve data from JSON server
     function getCurl($url, $website)
     {
 
@@ -370,11 +368,7 @@
 
 
 
-
-
- 
-
- 
+    //generate unique identifier
     function gen_uuid() {
         return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
@@ -396,7 +390,10 @@
             mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
         );
     }
-   
+ 
+
+ 
+    //redirect to homepage
     header("Location: https://colourmypot.com/");
 
 
